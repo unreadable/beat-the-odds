@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Ce se întâmplă când 1000 de cimpanzei fac câte 100 de trade-uri la întâmplare? Simulare interactivă care arată de ce winrate-ul singur nu contează fără risk:reward.">
-<meta property="og:title" content="Beat the Odds — 1000 Cimpanzei × 100 Trade-uri">
-<meta property="og:description" content="Simulare interactivă: 1000 de cimpanzei tranzacționează random. Câți par traderi buni doar din noroc?">
+<meta name="description" content="What happens when 1,000 random strategies make 100 trades each? Interactive simulation showing why winrate alone means nothing without risk-to-reward.">
+<meta property="og:title" content="Beat the Odds — 1,000 Random Strategies × 100 Trades">
+<meta property="og:description" content="1,000 random strategies. 100 trades each. No skill, no edge — just luck. How many look profitable? The answer will surprise you.">
 <meta property="og:type" content="website">
-<title>Beat the Odds — Simulare Traderi Cimpanzei</title>
+<title>Beat the Odds — Random Strategy Benchmark</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -256,7 +256,6 @@ body {
 .prose-list {
   overflow-y: auto;
   max-height: 340px;
-  padding: 8px 0;
 }
 .prose-list::-webkit-scrollbar { width: 4px; }
 .prose-list::-webkit-scrollbar-track { background: transparent; }
@@ -289,6 +288,133 @@ body {
 .chart-area { padding: 16px 14px 12px; }
 .chart-wrap { position: relative; width: 100%; height: 280px; }
 
+/* ── MONTE CARLO MODULE ── */
+.mc-divider {
+  border: none;
+  border-top: 2px solid var(--border2);
+  margin: 56px 0 48px;
+}
+
+.mc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.mc-header h2 {
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.mc-header h2 span { color: var(--blue); }
+
+.mc-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.mc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mc-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mc-input {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.mc-input:focus { border-color: var(--blue); }
+
+.mc-be-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mc-be-toggle input[type="checkbox"] {
+  accent-color: var(--blue);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.mc-be-toggle span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mc-be-panel {
+  display: none;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.mc-be-panel.open { display: block; }
+
+.mc-be-panel .mc-inputs { margin-bottom: 0; }
+
+.mc-be-hint {
+  font-size: 11px;
+  color: var(--muted2);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.mc-be-probs {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.mc-be-probs .g { color: var(--green); font-weight: 600; }
+.mc-be-probs .r { color: var(--red); font-weight: 600; }
+.mc-be-probs .b { color: var(--blue); font-weight: 600; }
+
+.mc-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.mc-equity-wrap { position: relative; width: 100%; height: 340px; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 500px) {
   .page { padding: 0 14px 60px; }
@@ -297,6 +423,8 @@ body {
   .stat-card { padding: 14px; }
   .stat-value { font-size: 20px; }
   .section { margin-bottom: 32px; }
+  .mc-inputs { grid-template-columns: 1fr 1fr; }
+  .mc-stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -306,49 +434,49 @@ body {
   <!-- HEADER -->
   <div class="header">
     <div class="header-left">
-      <h1><span>1000</span> Cimpanzei × <span>100</span> Trade-uri</h1>
+      <h1><span>1,000</span> Random Strategies × <span>100</span> Trades</h1>
     </div>
     <button class="run-btn" id="runBtn" onclick="runSim()">
-      <span class="icon">▶︎</span> Rulează simularea
+      <span class="icon">▶︎</span> Run simulation
     </button>
   </div>
 
   <!-- SUBTITLE -->
-  <p class="subtitle">Ce se întâmplă când <span class="subtitle-accent">1000</span> de cimpanzei fac câte <span class="subtitle-accent">100</span> de trade-uri la întâmplare. Fiecare trade are <span class="subtitle-accent">50%</span> șansă — random total, fără strategie. <br><br> <span class="subtitle-pill" id="runCounter">Simularea #1</span></p>
+  <p class="subtitle">What happens when <span class="subtitle-accent">1,000</span> random strategies each make <span class="subtitle-accent">100</span> trades? Every trade is a <span class="subtitle-accent">50/50</span> coin flip — no skill, no strategy, no edge. Like a monkey randomly pressing buy or sell. <br><br> <span class="subtitle-pill" id="runCounter">Simulation #1</span></p>
 
   <!-- INSIGHT BOX -->
   <div class="insight-box" id="insightBox" style="display:none">
-    <div class="insight-title">Ce arată simularea</div>
+    <div class="insight-title">Key insights</div>
     <div class="insight-row" id="insight1"></div>
     <div class="insight-row" id="insight2"></div>
     <div class="insight-row" id="insight3"></div>
-    <div class="insight-note">Toți au tranzacționat complet random — nimeni nu a avut strategie. Winrate-ul singur nu spune nimic fără risk:reward.</div>
+    <div class="insight-note">Every strategy traded completely at random — none had any edge. Winrate alone means nothing without a proper risk-to-reward ratio.</div>
   </div>
 
   <!-- GLOBAL STATS -->
   <div class="stats-grid">
     <div class="stat-card">
-      <span class="stat-label">Winrate mediu</span>
+      <span class="stat-label">Average winrate</span>
       <span class="stat-value" id="g-avgwr">—</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">R:R minim profitabil</span>
+      <span class="stat-label">Min R:R to profit</span>
       <span class="stat-value" id="g-minrr">—</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Cel mai mare Winrate</span>
+      <span class="stat-label">Highest winrate</span>
       <span class="stat-value" id="g-maxwr">—</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Cel mai mic Winrate</span>
+      <span class="stat-label">Lowest winrate</span>
       <span class="stat-value" id="g-minwr">—</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Cele mai multe câștiguri la rând</span>
+      <span class="stat-label">Longest win streak</span>
       <span class="stat-value" id="g-recmw">—</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Cele mai multe pierderi la rând</span>
+      <span class="stat-label">Longest loss streak</span>
       <span class="stat-value" id="g-recml">—</span>
     </div>
   </div>
@@ -357,19 +485,19 @@ body {
   <div class="section">
     <div class="section-header">
       <span class="section-num">01</span>
-      <span class="section-title">Distribuție winrate trade-uri</span>
+      <span class="section-title">Winrate distribution</span>
     </div>
     <div class="panel-pair">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label" id="wr-badge">Listă</span>
+          <span class="panel-label" id="wr-badge">List</span>
         </div>
         <div class="prose-list" id="wrList">
         </div>
       </div>
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label">Evoluția ratei de câștig</span>
+          <span class="panel-label">Winrate frequency</span>
         </div>
         <div class="chart-area">
           <div class="chart-wrap">
@@ -384,19 +512,19 @@ body {
   <div class="section">
     <div class="section-header">
       <span class="section-num">02</span>
-      <span class="section-title">Cele mai multe trade-uri câștigate la rând</span>
+      <span class="section-title">Longest winning streaks</span>
     </div>
     <div class="panel-pair">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label" id="mw-badge">Listă</span>
+          <span class="panel-label" id="mw-badge">List</span>
         </div>
         <div class="prose-list" id="mwList">
         </div>
       </div>
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label">Distribuția seriilor de câștiguri</span>
+          <span class="panel-label">Win streak distribution</span>
         </div>
         <div class="chart-area">
           <div class="chart-wrap">
@@ -411,23 +539,167 @@ body {
   <div class="section">
     <div class="section-header">
       <span class="section-num">03</span>
-      <span class="section-title">Cele mai multe trade-uri pierdute la rând</span>
+      <span class="section-title">Longest losing streaks</span>
     </div>
     <div class="panel-pair">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label" id="ml-badge">Listă</span>
+          <span class="panel-label" id="ml-badge">List</span>
         </div>
         <div class="prose-list" id="mlList">
         </div>
       </div>
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-label">Distribuția seriilor de pierderi</span>
+          <span class="panel-label">Loss streak distribution</span>
         </div>
         <div class="chart-area">
           <div class="chart-wrap">
             <canvas id="chartML"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ 04  MONTE CARLO PERSONAL ══════════ -->
+  <hr class="mc-divider">
+
+  <div class="mc-header">
+    <h2>Test your <span>strategy</span></h2>
+    <button class="run-btn" id="mcBtn" onclick="runMC()">
+      <span class="icon">▶︎</span> Simulate
+    </button>
+  </div>
+
+  <p class="subtitle" style="margin-bottom:24px">
+    Enter your strategy parameters and see <span class="subtitle-accent">1,000</span> possible outcomes.
+    Same winrate, same risk:reward — wildly different results depending on the order of wins and losses.
+  </p>
+
+  <div class="mc-inputs">
+    <div class="mc-field">
+      <label class="mc-label" for="mcWR">Winrate (%)</label>
+      <input class="mc-input" id="mcWR" type="number" value="55" min="1" max="99" step="1">
+    </div>
+    <div class="mc-field">
+      <label class="mc-label" for="mcRR">Risk : Reward</label>
+      <input class="mc-input" id="mcRR" type="number" value="2" min="0.1" max="20" step="0.1">
+    </div>
+    <div class="mc-field">
+      <label class="mc-label" for="mcRisk">Risk per trade (%)</label>
+      <input class="mc-input" id="mcRisk" type="number" value="2" min="0.1" max="50" step="0.1">
+    </div>
+    <div class="mc-field">
+      <label class="mc-label" for="mcTrades">Number of trades</label>
+      <input class="mc-input" id="mcTrades" type="number" value="100" min="10" max="2000" step="10">
+    </div>
+    <div class="mc-field">
+      <label class="mc-label" for="mcBalance">Starting balance ($)</label>
+      <input class="mc-input" id="mcBalance" type="number" value="10000" min="100" max="10000000" step="100">
+    </div>
+  </div>
+
+  <label class="mc-be-toggle">
+    <input type="checkbox" id="mcBEToggle" onchange="document.getElementById('mcBEPanel').classList.toggle('open', this.checked)">
+    <span>Break-even management</span>
+  </label>
+
+  <div class="mc-be-panel" id="mcBEPanel">
+    <div class="mc-inputs">
+      <div class="mc-field">
+        <label class="mc-label" for="mcBETrigger">Trigger (R)</label>
+        <input class="mc-input" id="mcBETrigger" type="number" value="1" min="0.1" max="20" step="0.1">
+      </div>
+      <div class="mc-field">
+        <label class="mc-label" for="mcBELevel">Move SL to (R)</label>
+        <input class="mc-input" id="mcBELevel" type="number" value="0" min="-1" max="10" step="0.1">
+      </div>
+    </div>
+    <div class="mc-be-hint">
+      Trigger = how far price must move in your favor (in R) before the stop loss moves. Move SL to = where the stop loss moves to (0 = entry price, 0.1 = small profit locked in).
+      Probabilities are calculated automatically using a standard pricing model (Brownian motion) that estimates how price moves between your levels.
+    </div>
+    <div class="mc-be-probs" id="mcBEProbs" style="display:none"></div>
+  </div>
+
+  <!-- MC INSIGHT -->
+  <div class="insight-box" id="mcInsightBox" style="display:none">
+    <div class="insight-title">What the simulation shows</div>
+    <div class="insight-row" id="mcInsight1"></div>
+    <div class="insight-row" id="mcInsight2"></div>
+    <div class="insight-row" id="mcInsight3"></div>
+    <div class="insight-note" id="mcInsightNote"></div>
+  </div>
+
+  <!-- MC STATS -->
+  <div class="mc-stats-grid" id="mcStatsGrid" style="display:none">
+    <div class="stat-card">
+      <span class="stat-label">Median</span>
+      <span class="stat-value" id="mc-median">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Best case</span>
+      <span class="stat-value green" id="mc-best">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Worst case</span>
+      <span class="stat-value red" id="mc-worst">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Ruin (balance = 0)</span>
+      <span class="stat-value red" id="mc-ruin">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Severe drawdown (−80%)</span>
+      <span class="stat-value red" id="mc-blowup">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Median max drawdown</span>
+      <span class="stat-value red" id="mc-dd">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Profitable</span>
+      <span class="stat-value green" id="mc-profit">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">P10</span>
+      <span class="stat-value red" id="mc-p10">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">P25</span>
+      <span class="stat-value red" id="mc-p25">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">P75</span>
+      <span class="stat-value green" id="mc-p75">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">P90</span>
+      <span class="stat-value green" id="mc-p90">—</span>
+    </div>
+  </div>
+
+  <!-- MC CHARTS -->
+  <div class="section" id="mcChartsSection" style="display:none">
+    <div class="panel-pair">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-label">Equity curves (50 scenarios)</span>
+        </div>
+        <div class="chart-area">
+          <div class="mc-equity-wrap">
+            <canvas id="chartMCEquity"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-label">Final balance distribution</span>
+        </div>
+        <div class="chart-area">
+          <div class="mc-equity-wrap">
+            <canvas id="chartMCHist"></canvas>
           </div>
         </div>
       </div>
@@ -443,11 +715,12 @@ body {
 <script>
 const charts = {};
 let runCount = 0;
+const cimpText = v => v === 1 ? '1 strategy' : `${v} strategies`;
 
 function runSim() {
   const btn = document.getElementById('runBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="icon">⏳</span> Se calculează...';
+  btn.innerHTML = '<span class="icon">⏳</span> Running...';
 
   setTimeout(() => {
     const t0 = performance.now();
@@ -473,7 +746,7 @@ function runSim() {
       if (wins < minWR) minWR = wins;
       if (mw > maxMW) maxMW = mw;
       if (ml > maxML) maxML = ml;
-      const wrPct = Math.round(wins / F * 100);
+      const wrPct = Math.round(wins / F * 1000) / 10; // 1 decimal, avoid float key issues
       if (wrPct > 50) over50++;
       else if (wrPct < 50) under50++;
       if (wins > topChimp.wr) {
@@ -507,22 +780,22 @@ function runSim() {
     setStat('g-recmw', maxMW, 'green');
     setStat('g-recml', maxML, 'red');
     const minWRpctCard = +(toPct(minWR));
-    const minRRcard = ceilRR((100 - minWRpctCard) / minWRpctCard);
+    const minRRcard = minWRpctCard > 0 ? ceilRR((100 - minWRpctCard) / minWRpctCard) : '∞';
     setStat('g-minrr', '1:' + minRRcard, 'blue');
 
     // Insight box
     document.getElementById('insightBox').style.display = '';
     document.getElementById('insight1').innerHTML =
-      `Din ${N} de cimpanzei, doar <span class="g">${over50}</span> au avut peste 50% winrate, <span class="r">${under50}</span> sub 50%, și <span class="b">${exact50}</span> exact 50%`;
+      `Of ${N} random strategies, <span class="g">${over50}</span> ended above 50% winrate, <span class="r">${under50}</span> below 50%, and <span class="b">${exact50}</span> landed exactly at 50%`;
     document.getElementById('insight2').innerHTML =
-      `Cel mai "bun" cimpanzeu: <span class="g">${toPct(topChimp.wr)}%</span> winrate și <span class="b">${topChimp.mw}</span> câștiguri la rând — pare trader profesionist, dar e doar noroc`;
+      `The "best" one hit <span class="g">${toPct(topChimp.wr)}%</span> winrate with <span class="b">${topChimp.mw}</span> wins in a row — looks like a skilled trader, but it's 100% luck`;
     const minWRpct = +(toPct(minWR));
-    const minRR = ceilRR((100 - minWRpct) / minWRpct);
+    const minRR = minWRpct > 0 ? ceilRR((100 - minWRpct) / minWRpct) : '∞';
     document.getElementById('insight3').innerHTML =
-      `Cel mai mic winrate a fost <span class="r">${minWRpct}%</span>. Ca să fie profitabil și el, ar avea nevoie de minim R:R de <span class="g">1:${minRR}</span>. Cu cât winrate-ul e mai mic, cu atât ai nevoie de un R:R mai mare ca să acoperi pierderile`;
+      `Lowest winrate: <span class="r">${minWRpct}%</span>. Even this could be profitable with a risk:reward of at least <span class="g">1:${minRR}</span> — lower winrate just means you need bigger winners to compensate`;
 
     // Run counter
-    document.getElementById('runCounter').textContent = 'Simularea #' + runCount;
+    document.getElementById('runCounter').textContent = 'Simulation #' + runCount;
 
     // Helpers
     const byKey  = f => Object.entries(f).map(([k,v]) => [+k, v]).sort((a,b) => a[0]-b[0]);
@@ -539,21 +812,22 @@ function runSim() {
         })
         .join('');
     }
-    const cimp = v => v == 1 ? '<span class="n">1</span> cimpanzeu' : `<span class="n">${v}</span> cimpanzei`;
+    const strat = v => v === 1 ? '<span class="n">1</span> strategy' : `<span class="n">${v}</span> strategies`;
     buildList('wrList', wrFreq, (k,v) =>
-      `${cimp(v)} cu winrate <span class="n">${k}%</span>`, 'var(--blue)');
+      `${strat(v)} with <span class="n">${k}%</span> winrate`, 'var(--blue)');
     buildList('mwList', mwFreq, (k,v) =>
-      `${cimp(v)} cu max <span class="n">${k}</span> câștiguri la rând`, 'var(--green)');
+      `${strat(v)} with max <span class="n">${k}</span> wins in a row`, 'var(--green)');
     buildList('mlList', mlFreq, (k,v) =>
-      `${cimp(v)} cu max <span class="n">${k}</span> pierderi la rând`, 'var(--red)');
+      `${strat(v)} with max <span class="n">${k}</span> losses in a row`, 'var(--red)');
 
     const wrK = byKey(wrFreq), mwK = byKey(mwFreq), mlK = byKey(mlFreq);
-    document.getElementById('wr-badge').textContent = wrK.length + ' rezultate diferite';
-    document.getElementById('mw-badge').textContent = mwK.length + ' rezultate diferite';
-    document.getElementById('ml-badge').textContent = mlK.length + ' rezultate diferite';
+    document.getElementById('wr-badge').textContent = wrK.length + ' distinct results';
+    document.getElementById('mw-badge').textContent = mwK.length + ' distinct results';
+    document.getElementById('ml-badge').textContent = mlK.length + ' distinct results';
 
     // Charts
     function buildChart(id, data, lineColor, fillColor, xLabel) {
+      if (typeof Chart === 'undefined') return;
       if (charts[id]) charts[id].destroy();
 
       const labels = data.map(([k]) => k);
@@ -609,7 +883,7 @@ function runSim() {
               padding: 12,
               callbacks: {
                 title: items => `${xLabel}: ${items[0].label}`,
-                label: item  => item.datasetIndex === 0 ? (item.parsed.y == 1 ? '1 cimpanzeu' : `${item.parsed.y} de cimpanzei`) : null,
+                label: item  => item.datasetIndex === 0 ? cimpText(item.parsed.y) : null,
                 filter: item => item.datasetIndex === 0,
               }
             }
@@ -638,7 +912,7 @@ function runSim() {
               border: { color: 'rgba(0,0,0,0.07)' },
               title: {
                 display: true,
-                text: 'număr de cimpanzei',
+                text: 'number of strategies',
                 color: '#A6B0C3',
                 font: { family: 'JetBrains Mono', size: 10 }
               }
@@ -648,12 +922,345 @@ function runSim() {
       });
     }
 
-    buildChart('wr',  wrK,  '#58a5fb', 'rgba(88,165,251,0.12)',  'rata de câștig în procente');
-    buildChart('mw',  mwK,  '#16c784', 'rgba(22,199,132,0.12)',  'număr de trade-uri câștigate la rând');
-    buildChart('ml',  mlK,  '#ea3943', 'rgba(234,57,67,0.12)',   'număr de trade-uri pierdute la rând');
+    buildChart('wr',  wrK,  '#58a5fb', 'rgba(88,165,251,0.12)',  'winrate (%)');
+    buildChart('mw',  mwK,  '#16c784', 'rgba(22,199,132,0.12)',  'consecutive wins');
+    buildChart('ml',  mlK,  '#ea3943', 'rgba(234,57,67,0.12)',   'consecutive losses');
 
     btn.disabled = false;
-    btn.innerHTML = '<span class="icon">▶︎</span> Rulează simularea';
+    btn.innerHTML = '<span class="icon">▶︎</span> Run simulation';
+  }, 30);
+}
+
+// ══════════ MONTE CARLO PERSONAL ══════════
+const mcCharts = {};
+
+function runMC() {
+  const btn = document.getElementById('mcBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="icon">⏳</span> Simulating...';
+
+  setTimeout(() => {
+    const wr      = parseFloat(document.getElementById('mcWR').value) / 100;
+    const rr      = parseFloat(document.getElementById('mcRR').value);
+    const riskPct = parseFloat(document.getElementById('mcRisk').value) / 100;
+    const nTrades = parseInt(document.getElementById('mcTrades').value, 10);
+    const startBal = parseFloat(document.getElementById('mcBalance').value);
+    const beEnabled = document.getElementById('mcBEToggle').checked;
+    const beTrigger = parseFloat(document.getElementById('mcBETrigger').value);
+    const beLevel   = parseFloat(document.getElementById('mcBELevel').value);
+
+    // Validate BE params
+    if (beEnabled && beTrigger >= rr) {
+      alert(`Trigger (${beTrigger}R) must be below R:R (${rr}). Otherwise the trade closes at TP before reaching the trigger.`);
+      btn.disabled = false;
+      btn.innerHTML = '<span class="icon">▶︎</span> Simulate';
+      return;
+    }
+    if (beEnabled && beLevel >= beTrigger) {
+      alert(`New SL (${beLevel}R) must be below trigger (${beTrigger}R).`);
+      btn.disabled = false;
+      btn.innerHTML = '<span class="icon">▶︎</span> Simulate';
+      return;
+    }
+
+    // ── Compute BE probabilities using Brownian motion ──
+    // P(hit +a before -b) = (1-e^{-2μb}) / (1-e^{-2μ(a+b)}) for drift μ
+    // When μ=0: P = b/(a+b)
+    let pWin = wr, pBE = 0, pLoss = 1 - wr;
+
+    if (beEnabled) {
+      const sl = 1; // SL distance in R
+      const tp = rr;
+      const noBeWR = sl / (sl + tp); // winrate when μ=0
+
+      // Helper: P(hit +a before -b) given drift μ
+      const pHit = (a, b, mu) => {
+        if (Math.abs(mu) < 1e-12) return b / (a + b);
+        const eb = Math.exp(-2 * mu * b);
+        const eab = Math.exp(-2 * mu * (a + b));
+        return (1 - eb) / (1 - eab);
+      };
+
+      // Binary search for μ such that P(+tp before -sl) = wr
+      let lo = -20, hi = 20;
+      if (Math.abs(wr - noBeWR) < 1e-9) {
+        lo = hi = 0; // exact μ=0
+      } else {
+        for (let i = 0; i < 100; i++) {
+          const mid = (lo + hi) / 2;
+          if (pHit(tp, sl, mid) < wr) lo = mid; else hi = mid;
+        }
+      }
+      const mu = (lo + hi) / 2;
+
+      // P(hit trigger before SL)
+      const pTrigger = pHit(beTrigger, sl, mu);
+      // P(hit TP before new SL, starting from trigger position)
+      const pTPfromTrigger = pHit(tp - beTrigger, beTrigger - beLevel, mu);
+
+      pWin  = pTrigger * pTPfromTrigger;
+      pBE   = pTrigger * (1 - pTPfromTrigger);
+      pLoss = 1 - pTrigger;
+
+      // Show computed probabilities
+      const probsEl = document.getElementById('mcBEProbs');
+      probsEl.style.display = '';
+      probsEl.innerHTML =
+        `<span class="g">Win (TP):</span> ${(pWin*100).toFixed(1)}% → +${rr}R &nbsp;│&nbsp; ` +
+        `<span class="b">BE stop:</span> ${(pBE*100).toFixed(1)}% → ${beLevel >= 0 ? '+' : ''}${beLevel}R &nbsp;│&nbsp; ` +
+        `<span class="r">Loss (SL):</span> ${(pLoss*100).toFixed(1)}% → −1R`;
+    } else {
+      document.getElementById('mcBEProbs').style.display = 'none';
+    }
+
+    const SIMS    = 1000;
+    const CURVES  = 50; // how many equity curves to draw
+
+    const finalBalances = [];
+    const maxDrawdowns  = [];
+    const equityCurves  = []; // store CURVES sample paths
+    let ruinCount = 0;    // balance hits 0
+    let blowupCount = 0;  // balance drops below 20% of start
+    let profitCount = 0;
+
+    for (let s = 0; s < SIMS; s++) {
+      let bal = startBal;
+      let peak = bal;
+      let maxDD = 0;
+      const storeCurve = s < CURVES;
+      const curve = storeCurve ? [bal] : null;
+
+      for (let t = 0; t < nTrades; t++) {
+        const risk = bal * riskPct;
+        const roll = Math.random();
+        if (roll < pWin) {
+          bal += risk * rr;       // full win: hit TP
+        } else if (roll < pWin + pBE) {
+          bal += risk * beLevel;  // BE stop
+        } else {
+          bal -= risk;            // full loss: hit SL
+        }
+        if (bal <= 0) { bal = 0; }
+        if (bal > peak) peak = bal;
+        const dd = peak > 0 ? (peak - bal) / peak : 0;
+        if (dd > maxDD) maxDD = dd;
+        if (storeCurve) curve.push(bal);
+      }
+
+      finalBalances.push(bal);
+      maxDrawdowns.push(maxDD);
+      if (bal <= 0) ruinCount++;
+      if (bal <= startBal * 0.2) blowupCount++;
+      if (bal > startBal) profitCount++;
+      if (storeCurve) equityCurves.push(curve);
+    }
+
+    // Sort for percentiles
+    const sorted = [...finalBalances].sort((a, b) => a - b);
+    const ddSorted = [...maxDrawdowns].sort((a, b) => a - b);
+    const pct = (arr, p) => arr[Math.floor(arr.length * p)];
+    const median = pct(sorted, 0.5);
+    const best = sorted[sorted.length - 1];
+    const worst = sorted[0];
+    const medianDD = pct(ddSorted, 0.5);
+    const ruinPct = (ruinCount / SIMS * 100).toFixed(1);
+    const blowupPct = (blowupCount / SIMS * 100).toFixed(1);
+    const profitPctVal = (profitCount / SIMS * 100).toFixed(1);
+    const p10 = pct(sorted, 0.1);
+    const p25 = pct(sorted, 0.25);
+    const p75 = pct(sorted, 0.75);
+    const p90 = pct(sorted, 0.9);
+
+    const fmtMoney = v => {
+      if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+      if (v >= 1e4) return '$' + (v / 1e3).toFixed(1) + 'K';
+      return '$' + v.toFixed(0);
+    };
+
+    // Stats
+    document.getElementById('mcStatsGrid').style.display = '';
+    document.getElementById('mc-median').textContent = fmtMoney(median);
+    document.getElementById('mc-best').textContent = fmtMoney(best);
+    document.getElementById('mc-worst').textContent = fmtMoney(worst);
+    document.getElementById('mc-ruin').textContent = ruinPct + '%';
+    document.getElementById('mc-blowup').textContent = blowupPct + '%';
+    document.getElementById('mc-dd').textContent = (medianDD * 100).toFixed(1) + '%';
+    document.getElementById('mc-profit').textContent = profitPctVal + '%';
+    document.getElementById('mc-p10').textContent = fmtMoney(p10);
+    document.getElementById('mc-p25').textContent = fmtMoney(p25);
+    document.getElementById('mc-p75').textContent = fmtMoney(p75);
+    document.getElementById('mc-p90').textContent = fmtMoney(p90);
+
+    // Color the median
+    const medianEl = document.getElementById('mc-median');
+    medianEl.className = 'stat-value blue';
+
+    // Insights
+    document.getElementById('mcInsightBox').style.display = '';
+    const expectancy = (pWin * rr + pBE * beLevel - pLoss).toFixed(3);
+    const expectancyNoMgmt = (wr * rr - (1 - wr)).toFixed(3);
+    const expectancyColor = expectancy > 0 ? 'g' : expectancy < 0 ? 'r' : 'b';
+    const beDelta = beEnabled ? (expectancy - expectancyNoMgmt).toFixed(3) : null;
+    const beDeltaNote = beEnabled
+      ? ` (without BE: ${expectancyNoMgmt}R, delta: <span class="${beDelta >= 0 ? 'g' : 'r'}">${beDelta >= 0 ? '+' : ''}${beDelta}R</span>)`
+      : '';
+    document.getElementById('mcInsight1').innerHTML =
+      `Expected profit per trade: <span class="${expectancyColor}">${expectancy}R</span>${beDeltaNote} — ${expectancy > 0 ? 'your strategy has a positive edge over time' : expectancy < 0 ? 'your strategy loses money over time' : 'you are exactly at breakeven — no edge'}`;
+    document.getElementById('mcInsight2').innerHTML =
+      `Out of ${SIMS} simulations, <span class="g">${profitCount}</span> ended in profit and <span class="r">${SIMS - profitCount}</span> in loss`;
+    document.getElementById('mcInsight3').innerHTML =
+      `Same strategy, wildly different outcomes: final balance ranges from <span class="r">${fmtMoney(worst)}</span> to <span class="g">${fmtMoney(best)}</span> — the order of wins and losses matters`;
+
+    const breakEvenRR = wr > 0 ? ((1 - wr) / wr).toFixed(2) : '∞';
+    document.getElementById('mcInsightNote').textContent =
+      expectancy > 0
+        ? `With a ${(wr*100).toFixed(0)}% winrate, you only need a 1:${breakEvenRR} risk:reward to break even. Your 1:${rr} is above that — you have an edge.`
+        : expectancy < 0
+        ? `With a ${(wr*100).toFixed(0)}% winrate, you need at least 1:${breakEvenRR} risk:reward to break even. Your 1:${rr} falls short.`
+        : `With a ${(wr*100).toFixed(0)}% winrate and 1:${rr} risk:reward, you're exactly at breakeven — no edge, no loss.`;
+
+    // Show charts section
+    document.getElementById('mcChartsSection').style.display = '';
+
+    // ── Equity curves chart ──
+    if (typeof Chart !== 'undefined') {
+      if (mcCharts.equity) mcCharts.equity.destroy();
+
+      const labels = Array.from({ length: nTrades + 1 }, (_, i) => i);
+      const datasets = equityCurves.map((curve, i) => {
+        const final = curve[curve.length - 1];
+        const color = final >= startBal ? 'rgba(22,199,132,0.15)' : 'rgba(234,57,67,0.15)';
+        return {
+          data: curve,
+          borderColor: color,
+          borderWidth: 1,
+          pointRadius: 0,
+          fill: false,
+          tension: 0.1,
+        };
+      });
+
+      // Add the starting balance reference line
+      datasets.push({
+        data: Array(nTrades + 1).fill(startBal),
+        borderColor: 'rgba(56,97,251,0.4)',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false,
+      });
+
+      mcCharts.equity = new Chart(document.getElementById('chartMCEquity'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 500 },
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            x: {
+              ticks: { color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 10 },
+              grid: { color: 'rgba(0,0,0,0.04)' },
+              border: { color: 'rgba(0,0,0,0.07)' },
+              title: { display: true, text: 'trade #', color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 } }
+            },
+            y: {
+              ticks: {
+                color: '#A6B0C3',
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v
+              },
+              grid: { color: 'rgba(0,0,0,0.04)' },
+              border: { color: 'rgba(0,0,0,0.07)' },
+              title: { display: true, text: 'balance ($)', color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 } }
+            }
+          }
+        }
+      });
+
+      // ── Final balance histogram ──
+      if (mcCharts.hist) mcCharts.hist.destroy();
+
+      const BINS = 30;
+      const minBal = sorted[0];
+      const maxBal = sorted[sorted.length - 1];
+      const binWidth = (maxBal - minBal) / BINS || 1;
+      const bins = Array(BINS).fill(0);
+      const binLabels = [];
+
+      for (let i = 0; i < BINS; i++) {
+        const lo = minBal + i * binWidth;
+        binLabels.push(fmtMoney(lo));
+      }
+      for (const b of sorted) {
+        let idx = Math.floor((b - minBal) / binWidth);
+        if (idx >= BINS) idx = BINS - 1;
+        bins[idx]++;
+      }
+
+      const histColors = binLabels.map((_, i) => {
+        const midVal = minBal + (i + 0.5) * binWidth;
+        return midVal >= startBal ? 'rgba(22,199,132,0.25)' : 'rgba(234,57,67,0.25)';
+      });
+      const histBorders = binLabels.map((_, i) => {
+        const midVal = minBal + (i + 0.5) * binWidth;
+        return midVal >= startBal ? '#16c784' : '#ea3943';
+      });
+
+      mcCharts.hist = new Chart(document.getElementById('chartMCHist'), {
+        type: 'bar',
+        data: {
+          labels: binLabels,
+          datasets: [{
+            data: bins,
+            backgroundColor: histColors,
+            borderColor: histBorders,
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 500 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#FFFFFF',
+              borderColor: 'rgba(0,0,0,0.10)',
+              borderWidth: 1,
+              titleColor: '#0D1421',
+              bodyColor: '#616E85',
+              titleFont: { family: 'JetBrains Mono', size: 11 },
+              bodyFont: { family: 'JetBrains Mono', size: 11 },
+              padding: 12,
+              callbacks: {
+                title: items => `Balance: ${items[0].label}`,
+                label: item => cimpText(item.parsed.y),
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 9 }, maxTicksLimit: 8, maxRotation: 45 },
+              grid: { color: 'rgba(0,0,0,0.04)' },
+              border: { color: 'rgba(0,0,0,0.07)' },
+              title: { display: true, text: 'final balance', color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 } }
+            },
+            y: {
+              ticks: { color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 } },
+              grid: { color: 'rgba(0,0,0,0.04)' },
+              border: { color: 'rgba(0,0,0,0.07)' },
+              title: { display: true, text: 'scenarios', color: '#A6B0C3', font: { family: 'JetBrains Mono', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<span class="icon">▶︎</span> Simulate';
   }, 30);
 }
 
